@@ -1,0 +1,42 @@
+class Node:
+  def __init__(self,data):
+    self.data=data
+    self.left=None
+    self.right=None
+
+def createbinarytree(arr,root,i,n):
+  if(i<n and arr[i] != "#"):
+    temp=Node(arr[i])
+    root=temp
+    
+    root.left=createbinarytree(arr,root.left,2*i+1,n)
+    root.right=createbinarytree(arr,root.right,2*i+2,n)
+    return root
+
+def check_mirror(root1,root2):
+  
+  
+  if(root1 is None and root2 is None):
+    return "true"
+  if(root1 is not None and root2 is not None):
+    if(root1.data==root2.data):
+      return(check_mirror(root1.left,root2.right)and check_mirror(root1.right,root2.left))
+  return "false"
+    
+def SymmetricTree(strArr):
+
+  n=len(strArr);
+  arr=strArr
+  
+  root="#"
+  root=createbinarytree(arr,root,0,n)
+  print(root.data)
+
+  sym=check_mirror(root,root)
+  
+  return sym
+
+
+
+# keep this function call here 
+print SymmetricTree(raw_input())
