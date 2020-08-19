@@ -1,0 +1,125 @@
+var AWS = require("aws-sdk");
+
+class AWSDataBase {
+  constructor() {
+    AWS.config.update({ region: "" });
+    var dynamodb = new AWS.DynamoDB();
+    this.documentClient = new AWS.DynamoDB.DocumentClient();
+  }
+
+  async readfilterdata(
+    tablename,
+    Filter_Expression,
+    Expression_AttributeValues
+  ) {
+    try {
+      var params = {
+        TableName: tablename,
+        FilterExpression: Filter_Expression,
+        ExpressionAttributeValues: Expression_AttributeValues
+      };
+      var result = await this.documentClient.scan(params).promise();
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async readalldata(tablename, userid, personization_table) {
+    try {
+      var params = {
+        TableName: tablename,
+        FilterExpression: "userID = :ui and persID = :pi",
+        ExpressionAttributeValues: {
+          ":ui": userid,
+          ":pi": personization_table
+        }
+      };
+      var result = await this.documentClient.scan(params).promise();
+      //console.log(result)
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async readalldata2(tablename, personization_table) {
+    try {
+      var params = {
+        TableName: tablename,
+        FilterExpression: "persID = :pi and visibilty= :vis",
+        ExpressionAttributeValues: {
+          ":pi": personization_table,
+          ":vis": "Public"
+        }
+      };
+      var result = await this.documentClient.scan(params).promise();
+      //console.log(result)
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async readalldata3(tablename, personization_table, userid) {
+    try {
+      var params = {
+        TableName: tablename,
+        FilterExpression: "persID = :pi and contains(visibleTo,:ui)",
+        ExpressionAttributeValues: {
+          ":pi": personization_table,
+          ":ui": userid
+        }
+      };
+      var result = await this.documentClient.scan(params).promise();
+      //console.log(result)
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+ 
+  async readbykey(tableName, key) {
+    try {
+      var params = {
+        Key: key,
+        TableName: tableName
+      };
+      var result = await this.documentClient.get(params).promise();
+      console.log(JSON.stringify(result));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async adddata(tableName, data) {
+    try {
+      var params = {
+        TableName: tableName,
+        Item: data
+      };
+      var result = await this.documentClient.put(params).promise();
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async updatedata(updobj) {
+    try {
+      var params = {
+        TableName: updobj.tablename,
+        Key: updobj.key,
+        UpdateExpression: updobj.updateexp,
+        ExpressionAttributeNames: updobj.ExpressionAttributeNames,
+        ExpressionAttributeValues: updobj.ExpressionAttributeValues
+      };
+      var result = await this.documentClient.update(params).promise();
+      console.log(JSON.stringify(result));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  
+}
+module.exports = AWSDataBase;
